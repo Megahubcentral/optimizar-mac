@@ -6,7 +6,7 @@ Permite limpiar cachés, reiniciar servicios internos, reparar permisos, reinici
 Instalación rápida
 
 Ejecuta este comando en Terminal:
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)"
+/bin/bash <(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)
 Características principales
 	•	Limpieza segura de cachés de usuario y del sistema
 	•	Reinicio completo de Spotlight
