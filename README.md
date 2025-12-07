@@ -1,40 +1,74 @@
-Este será EL comando único que cualquiera puede pegar en Terminal:
+🧠 AI Mac Optimizer
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)"
+Optimización inteligente para macOS (macOS 12 – macOS 15)
 
-¿Qué hace este comando?
-	1.	Descarga automáticamente tu archivo install.sh desde GitHub.
-	2.	Lo ejecuta.
-	3.	Y ese script a su vez:
-	•	Descarga optimizar_mac.sh
-	•	Le da permisos
-	•	Lo ejecuta como sudo
-	•	Optimiza el sistema
-	•	Genera logs
-	•	Todo sin que el usuario tenga que buscar nada.
+AI Mac Optimizer es una herramienta creada para diagnosticar, limpiar y optimizar tu Mac automáticamente.
+Incluye limpieza profunda de cachés, reinicio de servicios, reparación de permisos, análisis de procesos y generación de reporte final.
 
 ⸻
 
-✅ 2. Opcional pero recomendado: probarlo tú mismo
+🚀 Instalación rápida (1 solo comando)
 
-En cualquier Mac, incluso en la tuya:
-	1.	Abre Terminal
-	2.	Pega:
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)"
-  Si funciona bien ⇒ ya tienes tu AI Mac Optimizer Installer funcionando globalmente. 🚀😎
+Copia y pega en Terminal: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)"
+Este comando:
+	•	Descarga el instalador
+	•	Instala el optimizador
+	•	Ejecuta el proceso
+	•	Genera un log detallado
+	•	No requiere descargar archivos manualmente
+	🧹 Funciones del Optimizer
+	Función
+Descripción
+🔍 Diagnóstico del sistema
+Versión macOS + uso de disco + procesos que más consumen CPU y RAM
+🧹 Limpieza de cachés
+Cachés de usuario y sistema
+🧾 Limpieza de logs
+Eliminación de archivos de logs acumulados
+🔍 Reconstrucción Spotlight
+Detiene, limpia e inicia nuevo índice Spotlight
+🚀 Reparación de Launch Services
+Soluciona problemas al abrir apps
+🌐 Limpieza de DNS
+Flushea el DNS para mejorar internet / conexiones
+🔐 Reparación de permisos
+Repara permisos del usuario
+📊 Reporte final
+Muestra estado antes y después de la optimización
+📄 Archivos incluidos
+Archivo
+Función
+optimizar_mac.sh
+Script principal de optimización
+install.sh
+Instalador automático para cualquier Mac
+⚠️ Requisitos
+	•	macOS 12, 13, 14 o 15
+	•	Conexión a internet
+	•	Terminal + permisos de admin (sudo)
+🧪 Cómo probarlo localmente
+chmod +x optimizar_mac.sh
+sudo ./optimizar_mac.sh
+📝 Logs
+
+El script genera un archivo log detallado en:
+~/optimizar_mac_YYYYMMDD_HHMMSS.log
+Puedes compartir este log para diagnóstico avanzado.
 
 ⸻
 
-✅ 3. Si quieres lo dejamos aún más profesional
+📦 Próximas mejoras (versión 2.0)
+	•	Reporte HTML con gráficos de consumo
+	•	Análisis de salud del disco (SMART)
+	•	Escaneo de malware ligero
+	•	Optimización de apps de inicio
+	•	Panel web para ver estadísticas
+	•	Modo “Safe Optimize” y modo “Deep Optimize”
+	•	Interfaz gráfica (GUI) con SwiftUI
 
-Te puedo agregar:
+⸻
 
-✓ Un README bonito con instrucciones y screenshots
+👨🏻‍💻 Autor
 
-✓ Un icono / branding del proyecto
-
-✓ Una versión “Pro” del script (más diagnóstico, benchmarks, reportes HTML)
-
-✓ Un .pkg instalador doble-clic
-
-✓ Compatibilidad total con macOS 12–15
+Proyecto desarrollado por Victor Santana
+Optimizado y documentado con asistencia de AI (ChatGPT)
