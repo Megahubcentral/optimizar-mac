@@ -1,6 +1,6 @@
 #!/bin/zsh
 #
-# AI MAC OPTIMIZER – CORE SCRIPT v1.2
+# AI MAC OPTIMIZER – CORE SCRIPT v1.3 (SAFE)
 # Autor: Victor Santana + ChatGPT
 #
 
@@ -20,10 +20,14 @@ mkdir -p "$WORKDIR"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 HTMLREPORT="$WORKDIR/reporte_${TIMESTAMP}.html"
 
+# ==== DETECCIÓN DE USUARIO REAL (IMPORTANTE PARA SUDO) ====
+TARGET_USER="${SUDO_USER:-$(logname 2>/dev/null || id -un)}"
+USER_HOME="/Users/$TARGET_USER"
+
 banner() {
   echo ""
   echo "╔══════════════════════════════════════════════╗"
-  echo "║   ${BOLD}AI MAC OPTIMIZER – CORE SCRIPT v1.2${RESET}   ║"
+  echo "║   ${BOLD}AI MAC OPTIMIZER – CORE SCRIPT v1.3${RESET}   ║"
   echo "╚══════════════════════════════════════════════╝"
   echo ""
 }
@@ -85,6 +89,10 @@ section "INFORME INICIAL DEL SISTEMA"
 echo "${BOLD}Fecha:${RESET} $(date)"
 echo
 
+echo "${BOLD}Usuario objetivo:${RESET} $TARGET_USER"
+echo "${BOLD}Home:${RESET} $USER_HOME"
+echo ""
+
 echo "${BOLD}Versión de macOS:${RESET}"
 sw_vers
 echo ""
@@ -105,8 +113,12 @@ echo ""
 
 section "LIMPIEZA DE CACHÉS"
 
-spinner "Limpiando cachés de usuario..." \
-  rm -rf /Users/"$SUDO_USER"/Library/Caches/*
+if [[ -d "$USER_HOME/Library/Caches" ]]; then
+  spinner "Limpiando cachés de usuario..." \
+    rm -rf "$USER_HOME/Library/Caches/"*
+else
+  warn "No se encontró $USER_HOME/Library/Caches (se omite limpieza de usuario)."
+fi
 
 spinner "Limpiando cachés de sistema..." \
   rm -rf /Library/Caches/*
@@ -123,12 +135,12 @@ spinner "Eliminando logs en /var/log..." \
 section "REINICIO DE SPOTLIGHT"
 
 spinner "Desactivando indexación..." \
-  mdutil -a -i off >/dev/null 2>&1
+  mdutil -a -i off >/dev/null 2>&1 || true
 
 rm -rf /.Spotlight-V100 2>/dev/null || true
 
 spinner "Reactivando indexación..." \
-  mdutil -a -i on >/dev/null 2>&1
+  mdutil -a -i on >/dev/null 2>&1 || true
 
 info "Spotlight reiniciado. El sistema volverá a indexar en segundo plano."
 
@@ -141,7 +153,7 @@ LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchS
 if [[ -x "$LSREGISTER" ]]; then
   spinner "Reconstruyendo Launch Services..." \
     "$LSREGISTER" -kill -seed -r /Applications /System/Applications /System/Library/CoreServices >/dev/null 2>&1
-  info "Launch Services reconstruido (abre apps y iconos más estables)."
+  info "Launch Services reconstruido (arregla problemas al abrir apps, iconos raros, etc.)."
 else
   warn "No se encontró lsregister, se omite este paso."
 fi
@@ -153,12 +165,17 @@ section "LIMPIEZA DE CACHÉ DNS"
 spinner "Flusheando caché DNS..." \
   bash -c 'dscacheutil -flushcache 2>/dev/null; killall -HUP mDNSResponder 2>/dev/null || true'
 
-# ==== 7. PERMISOS DE USUARIO ====
+# ==== 7. AJUSTE SUAVE DE PERMISOS (SAFE) ====
 
-section "RESETEO BÁSICO DE PERMISOS DE USUARIO"
+section "AJUSTE SUAVE DE PERMISOS DE USUARIO (SAFE)"
 
-spinner "Reseteando permisos de usuario..." \
-  diskutil resetUserPermissions / "$(id -u "$SUDO_USER")" >/dev/null 2>&1
+if [[ -d "$USER_HOME" ]]; then
+  spinner "Aplicando permisos básicos de lectura/escritura en el home..." \
+    bash -c "chmod -R u+rwX '$USER_HOME' 2>/dev/null || true"
+  warn "No se ejecutó 'diskutil resetUserPermissions' para evitar reinicios automáticos."
+else
+  warn "No se encontró el home de $TARGET_USER en $USER_HOME. Se omite ajuste de permisos."
+fi
 
 # ==== 8. ANÁLISIS DE APPS PESADAS ====
 
@@ -172,7 +189,7 @@ echo "${BOLD}Top 10 procesos por RAM:${RESET}"
 ps aux | sort -nrk 4 | head -10
 echo ""
 
-# ==== 9. CHEQUEO RÁPIDO (NO DEFINITIVO) DE PROCESOS SOSPECHOSOS ====
+# ==== 9. CHEQUEO RÁPIDO DE PROCESOS SOSPECHOSOS ====
 
 section "CHEQUEO RÁPIDO DE PROCESOS SOSPECHOSOS"
 
@@ -181,9 +198,9 @@ ps aux | awk '$11 ~ /^\/Users\// {print}' | head -15 || true
 echo ""
 warn "Este chequeo NO reemplaza un antivirus, solo ayuda a identificar cosas raras."
 
-# ==== 10. INFORME FINAL ====
+# ==== 10. INFORME FINAL EN TERMINAL ====
 
-section "INFORME FINAL EN TERMINAL"
+section "INFORME FINAL"
 
 echo "${BOLD}Uso de disco en / (después):${RESET}"
 df -h /
@@ -216,6 +233,9 @@ cat > "$HTMLREPORT" <<EOF
 <body>
   <h1>AI Mac Optimizer – Reporte</h1>
   <p><strong>Fecha:</strong> $(date)</p>
+  <p><strong>Usuario:</strong> $TARGET_USER</p>
+  <p><strong>Home:</strong> $USER_HOME</p>
+
   <h2>Versión de macOS</h2>
   <pre>$(sw_vers)</pre>
 
@@ -229,7 +249,7 @@ cat > "$HTMLREPORT" <<EOF
   <pre>$(ps aux | sort -nrk 4 | head -10)</pre>
 
   <h2>Procesos ejecutando desde /Users (sospechosos a revisar)</h2>
-  <pre>$(ps aux | awk '$11 ~ /^\/Users\// {print}' | head -30)</pre>
+  <pre>$(ps aux | awk '\$11 ~ /^\/Users\// {print}' | head -30)</pre>
 
   <p class="warn">
     ⚠️ Este reporte es informativo. No reemplaza un antivirus ni una auditoría de seguridad profesional.
@@ -241,6 +261,6 @@ EOF
 info "Reporte HTML generado en: $HTMLREPORT"
 
 echo ""
-info "OPTIMIZACIÓN COMPLETA v1.2."
-warn "Recomendado: reiniciar tu Mac para aplicar todos los cambios."
+info "OPTIMIZACIÓN COMPLETA v1.3 (SAFE)."
+warn "Recomendado: reiniciar tu Mac manualmente cuando te convenga para aplicar todos los cambios."
 echo ""
