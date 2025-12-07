@@ -213,5 +213,5 @@ ps aux | sort -nrk 4 | head -5
 echo ""
 
 info "Optimización completada (v1.3.2, zsh safe)."
-warn "Puedes reiniciar tu Mac manualmente cuando te convenga para aplicar todos los cambios."
+warn "Puedes reiniciar tu Mac manualmente cuando te convenga para aplicar todos los cambioss."
 echo ""
