@@ -1,6 +1,6 @@
 #!/bin/zsh
 #
-# AI MAC OPTIMIZER – CORE SCRIPT v1.3.1 (ZSH SAFE)
+# AI MAC OPTIMIZER – CORE SCRIPT v1.3.2 (ZSH SAFE)
 # Autor: Victor Santana + ChatGPT
 #
 
@@ -27,7 +27,7 @@ USER_HOME="/Users/$TARGET_USER"
 banner() {
   echo ""
   echo "╔══════════════════════════════════════════════╗"
-  echo "║   ${BOLD}AI MAC OPTIMIZER – CORE SCRIPT v1.3.1${RESET}  ║"
+  echo "║  ${BOLD}AI MAC OPTIMIZER – CORE SCRIPT v1.3.2${RESET}  ║"
   echo "╚══════════════════════════════════════════════╝"
   echo ""
 }
@@ -40,89 +40,111 @@ section() {
 
 info()  { echo "${GREEN}[OK]${RESET} $1"; }
 warn()  { echo "${YELLOW}[!]${RESET} $1"; }
+error() { echo "${RED}[X]${RESET} $1"; }
 
-# ==== SPINNER COMPATIBLE ZSH ====
+# ==== SPINNER 100% COMPATIBLE CON ZSH ====
 spinner() {
   local msg="$1"
   shift
-  local spin='|/-\\'
+  local frames=('|' '/' '-' '\\')
   local i=1
 
   echo -n "$msg "
 
+  # Ejecuta el comando en segundo plano
   "$@" &>/dev/null &
   local pid=$!
 
-  while kill -0 $pid 2>/dev/null; do
-    printf "\b${spin:i++%4:1}"
-    sleep 0.15
+  # Animación simple mientras el comando corre
+  while kill -0 "$pid" 2>/dev/null; do
+    printf "\b%s" "${frames[$i]}"
+    i=$(( (i % 4) + 1 ))
+    sleep 0.2
   done
 
-  wait $pid
+  wait "$pid"
   echo -ne "\b"
   info "$msg"
 }
 
-# VALIDACIONES
+# ==== VALIDACIONES BÁSICAS ====
+
 if [[ "$(uname)" != "Darwin" ]]; then
-  echo "[X] Solo funciona en macOS."
+  error "Este script solo funciona en macOS."
   exit 1
 fi
 
 if [[ "$EUID" -ne 0 ]]; then
-  echo "Debes ejecutar con sudo:"
-  echo "sudo ./optimizar_mac.sh"
+  error "Debes ejecutar este script con sudo."
+  echo "Ejemplo: sudo ./optimizar_mac.sh"
   exit 1
 fi
 
 banner
 
-# ==== INFORME ====
+# ==== 1. INFORME INICIAL ====
+
 section "INFORME INICIAL DEL SISTEMA"
 
 echo "${BOLD}Fecha:${RESET} $(date)"
 echo ""
+echo "${BOLD}Usuario objetivo:${RESET} $TARGET_USER"
+echo "${BOLD}Home:${RESET} $USER_HOME"
+echo ""
+
+echo "${BOLD}Versión de macOS:${RESET}"
 sw_vers
 echo ""
 
+echo "${BOLD}Uso de disco en / (antes):${RESET}"
 df -h /
 echo ""
 
-echo "${BOLD}Top CPU:${RESET}"
+echo "${BOLD}Top 5 procesos por CPU (antes):${RESET}"
 ps aux | sort -nrk 3 | head -5
 echo ""
 
-echo "${BOLD}Top RAM:${RESET}"
+echo "${BOLD}Top 5 procesos por RAM (antes):${RESET}"
 ps aux | sort -nrk 4 | head -5
 echo ""
 
-# ===========================================================
-# ==========    LIMPIEZA DE CACHÉS CORREGIDA     ============
-# ===========================================================
+# ==== 2. LIMPIEZA DE CACHÉS ====
 
 section "LIMPIEZA DE CACHÉS"
 
-spinner "Limpiando cachés de usuario..." \
-  bash -c "rm -rf \"$USER_HOME/Library/Caches\"/* 2>/dev/null || true"
+if [[ -d "$USER_HOME/Library/Caches" ]]; then
+  spinner "Limpiando cachés de usuario..." \
+    bash -c "rm -rf \"$USER_HOME/Library/Caches\"/* 2>/dev/null || true"
+else
+  warn "No se encontró $USER_HOME/Library/Caches, se omite."
+fi
 
 spinner "Limpiando cachés de sistema..." \
   bash -c "rm -rf /Library/Caches/* 2>/dev/null || true"
 
-# ==== LOGS ====
+# ==== 3. LIMPIEZA DE LOGS ====
+
 section "LIMPIEZA DE LOGS"
 
-spinner "Eliminando logs..." \
+spinner "Eliminando logs en /var/log..." \
   bash -c "find /var/log -type f -name '*.log' -delete 2>/dev/null || true"
 
-# ==== SPOTLIGHT ====
+# ==== 4. SPOTLIGHT ====
+
 section "REINICIO DE SPOTLIGHT"
 
-spinner "Desactivando Spotlight..." mdutil -a -i off
+spinner "Desactivando indexación..." \
+  mdutil -a -i off
+
 rm -rf /.Spotlight-V100 2>/dev/null || true
-spinner "Reactivando Spotlight..." mdutil -a -i on
+
+spinner "Reactivando indexación..." \
+  mdutil -a -i on
+
 info "Spotlight se reindexará en segundo plano."
 
-# ==== LAUNCH SERVICES ====
+# ==== 5. LAUNCH SERVICES ====
+
 section "RECONSTRUYENDO LAUNCH SERVICES"
 
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
@@ -131,31 +153,65 @@ if [[ -x "$LSREGISTER" ]]; then
   spinner "Reconstruyendo Launch Services..." \
     "$LSREGISTER" -kill -seed -r /Applications /System/Applications /System/Library/CoreServices
 else
-  warn "No encontrado lsregister, se omite."
+  warn "No se encontró lsregister, se omite este paso."
 fi
 
-# ==== DNS ====
-section "LIMPIEZA DNS"
-spinner "Flusheando DNS..." \
-  bash -c "dscacheutil -flushcache; killall -HUP mDNSResponder"
+# ==== 6. DNS ====
 
-# ==== PERMISOS SEGURIDAD ====
+section "LIMPIEZA DE CACHÉ DNS"
+
+spinner "Flusheando caché DNS..." \
+  bash -c "dscacheutil -flushcache; killall -HUP mDNSResponder 2>/dev/null || true"
+
+# ==== 7. AJUSTE SUAVE DE PERMISOS ====
+
 section "AJUSTE SUAVE DE PERMISOS (SAFE)"
 
-spinner "Aplicando permisos básicos..." \
-  bash -c "chmod -R u+rwX \"$USER_HOME\" 2>/dev/null || true"
+if [[ -d "$USER_HOME" ]]; then
+  spinner "Aplicando permisos básicos en el home..." \
+    bash -c "chmod -R u+rwX \"$USER_HOME\" 2>/dev/null || true"
+  warn "No se ejecuta 'diskutil resetUserPermissions' para evitar reinicios automáticos."
+else
+  warn "No se encontró el home de $TARGET_USER en $USER_HOME."
+fi
 
-warn "No se usa diskutil resetUserPermissions (evita reinicios)."
+# ==== 8. ANÁLISIS DE PROCESOS PESADOS ====
 
-# ==== REPORTE FINAL ====
+section "ANÁLISIS DE PROCESOS QUE MÁS CONSUMEN"
+
+echo "${BOLD}Top 10 procesos por CPU:${RESET}"
+ps aux | sort -nrk 3 | head -10
+echo ""
+
+echo "${BOLD}Top 10 procesos por RAM:${RESET}"
+ps aux | sort -nrk 4 | head -10
+echo ""
+
+# ==== 9. PROCESOS SOSPECHOSOS ====
+
+section "CHEQUEO RÁPIDO DE PROCESOS DESDE /Users"
+
+echo "Procesos ejecutando binarios desde /Users (revisar manualmente):"
+ps aux | awk '$11 ~ /^\/Users\// {print}' | head -20 || true
+echo ""
+warn "Este chequeo no reemplaza un antivirus; solo ayuda a ver cosas raras."
+
+# ==== 10. INFORME FINAL EN TERMINAL ====
+
 section "INFORME FINAL"
 
+echo "${BOLD}Uso de disco en / (después):${RESET}"
 df -h /
 echo ""
+
+echo "${BOLD}Top 5 procesos por CPU (después):${RESET}"
 ps aux | sort -nrk 3 | head -5
 echo ""
-ps aux | sort -nrk 4 | head -5
 
-info "Optimización finalizada sin reinicios."
-warn "Puedes reiniciar manualmente para aplicar algunos cambios."
+echo "${BOLD}Top 5 procesos por RAM (después):${RESET}"
+ps aux | sort -nrk 4 | head -5
+echo ""
+
+info "Optimización completada (v1.3.2, zsh safe)."
+warn "Puedes reiniciar tu Mac manualmente cuando te convenga para aplicar todos los cambios."
 echo ""
