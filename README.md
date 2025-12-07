@@ -7,7 +7,7 @@ Instalación rápida
 
 Ejecuta este comando en Terminal:
 
-/bin/bash -c “$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)”
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)"
 
 ⸻
 
