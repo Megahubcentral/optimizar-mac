@@ -1,65 +1,87 @@
-# 🧹 Clean Mac Optimizer 2025
-Optimizador avanzado para macOS creado por Victor Santana + ChatGPT.  
-Permite limpiar cachés, reiniciar servicios internos, reparar permisos, reindexar Spotlight y mejorar el rendimiento general del sistema.
+Clean Mac Optimizer 2025
 
+Optimizador avanzado para macOS creado por Victor Santana + ChatGPT.
+Permite limpiar cachés, reiniciar servicios internos, reparar permisos, reiniciar Spotlight y mejorar el rendimiento general del sistema.
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)"
+Instalación rápida
 
----
+Ejecuta este comando en Terminal:
 
-## 🚀 Características principales
-- Limpieza segura de cachés de usuario y del sistema  
-- Reinicio completo de Spotlight  
-- Reconstrucción de Launch Services  
-- Flush de DNS  
-- Análisis de procesos que consumen CPU y RAM  
-- Reportes antes y después de la optimización  
-- Generación automática de logs  
-- Funcionamiento 100% automatizado con interfaz amigable
+/bin/bash -c “$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)”
 
----
+⸻
 
-## 📦 Instalación
-1. Descargue el archivo DMG  
-2. Abra *Clean Mac Optimizer 2025.dmg*  
-3. Arrastre la aplicación a su carpeta **Applications**  
-4. Abra la app  
-5. Si macOS bloquea la ejecución:  
-   - Preferencias del Sistema → Seguridad y Privacidad → "Permitir igualmente"
+✨ Características principales
+	•	Limpieza segura de cachés de usuario y del sistema
+	•	Reinicio completo de Spotlight
+	•	Reconstrucción de Launch Services
+	•	Flush de DNS
+	•	Análisis de procesos que consumen CPU y RAM
+	•	Reportes antes y después de la optimización
+	•	Generación automática de logs
+	•	Funcionamiento 100% automático con interfaz amigable
+	•	Compatible con macOS moderno (Intel y Apple Silicon)
 
----
+⸻
 
-## 📁 Estructura del proyecto
+📦 Instalación usando la app (versión gráfica)
+	1.	Descargue el archivo DMG
+	2.	Abra Clean Mac Optimizer 2025.dmg
+	3.	Arrástrelo a su carpeta Aplicaciones
+	4.	Abra la app
+	5.	Si macOS bloquea la ejecución, vaya a:
 
-/Clean Mac Optimizer 2025.app
-/Contents
-/MacOS
-Automator Application Stub
-/Resources
-document.wflow
+Preferencias del Sistema → Seguridad y Privacidad → “Permitir igualmente”
+
+⸻
+
+📁 Estructura del proyecto
+
+/Clean Mac Optimizer 2025.app/Contents
+/MacOS Automator Application Stub
+/Resources/document.wflow
 CleanMacIcon.icns
 Info.plist
 
----
+Los scripts principales del optimizador se encuentran en:
 
-## 📝 Logs generados
+/optimizar_mac.sh
+/install.sh
+
+⸻
+
+📝 Logs generados
+
 Los logs se guardan automáticamente en:
+
 ~/.optimizar-mac/
 
----
+Los informes incluyen:
+	•	Registro antes de la optimización
+	•	Registro posterior
+	•	Fecha y hora del proceso
+	•	Errores o advertencias detectadas
 
-## ⚠️ Seguridad
-Clean Mac Optimizer 2025 **no elimina archivos personales**,  
-solo archivos temporales o cachés seguros para limpiar.
+⸻
 
----
+👨‍💻 Uso avanzado (ejecutar solo el script principal)
 
-## 📬 Créditos
-**Desarrollador:** Victor Santana  
-**Asistente técnico:** ChatGPT  
+Si desea ejecutar únicamente el motor del optimizador:
 
----
+sudo /bin/zsh ~/.optimizar-mac/optimizar_mac.sh
 
-## 📄 Licencia
-Uso personal o empresarial permitido.  
-Prohibida la reventa sin autorización del autor.
+⸻
+
+🚧 Advertencia
+
+Este optimizador no reemplaza herramientas profesionales de seguridad.
+No elimina malware, pero ayuda a mejorar el rendimiento del sistema limpiando procesos y cachés comunes.
+
+Úselo bajo su propia responsabilidad.
+
+⸻
+
+🤝 Autor
+
+Creado por Victor Santana + ChatGPT
+Repositorio oficial: https://github.com/Megahubcentral/optimizar-mac
