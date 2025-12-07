@@ -2,6 +2,7 @@
 Optimizador avanzado para macOS creado por Victor Santana + ChatGPT.  
 Permite limpiar cachés, reiniciar servicios internos, reparar permisos, reindexar Spotlight y mejorar el rendimiento general del sistema.
 
+
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)"
 
 ---
