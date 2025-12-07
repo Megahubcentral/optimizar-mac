@@ -1,109 +1,148 @@
 #!/bin/zsh
 #
-# Script simple de diagnóstico y optimización para macOS
-# Victor + ChatGPT
+# AI MAC OPTIMIZER – CORE SCRIPT v1.1
+# Autor: Victor Santana + ChatGPT
 #
 
-echo "============================================="
-echo "  OPTIMIZACIÓN RÁPIDA DE MACOS"
-echo "  Fecha: $(date)"
-echo "============================================="
-echo
+set -e
 
-# ==== 1. INFORME BÁSICO DEL SISTEMA ====
+# ==== COLORES ====
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+CYAN="\033[0;36m"
+BOLD="\033[1m"
+RESET="\033[0m"
 
-echo "🔎 INFORME DEL SISTEMA"
-echo "----------------------"
-echo "Versión de macOS:"
+banner() {
+  echo ""
+  echo "╔══════════════════════════════════════════════╗"
+  echo "║   ${BOLD}AI MAC OPTIMIZER – CORE SCRIPT v1.1${RESET}   ║"
+  echo "╚══════════════════════════════════════════════╝"
+  echo ""
+}
+
+section() {
+  echo ""
+  echo "${CYAN}➤ $1${RESET}"
+  echo "----------------------------------------"
+}
+
+info()  { echo "${GREEN}[OK]${RESET} $1"; }
+warn()  { echo "${YELLOW}[!]${RESET} $1"; }
+error() { echo "${RED}[X]${RESET} $1"; }
+
+# ==== VALIDACIONES BÁSICAS ====
+
+if [[ "$(uname)" != "Darwin" ]]; then
+  error "Este script solo se puede ejecutar en macOS."
+  exit 1
+fi
+
+if [[ "$EUID" -ne 0 ]]; then
+  error "Por favor, ejecuta este script con sudo."
+  echo "Ejemplo: sudo ./optimizar_mac.sh"
+  exit 1
+fi
+
+banner
+
+# ==== 1. INFORME INICIAL DEL SISTEMA ====
+
+section "INFORME INICIAL DEL SISTEMA"
+
+echo "${BOLD}Versión de macOS:${RESET}"
 sw_vers
-echo
+echo ""
 
-echo "Uso de disco en /:"
+echo "${BOLD}Uso de disco en /:${RESET}"
 df -h /
-echo
+echo ""
 
-echo "Top 5 procesos por CPU:"
+echo "${BOLD}Top 5 procesos por CPU (antes):${RESET}"
 ps aux | sort -nrk 3 | head -5
-echo
+echo ""
 
-echo "Top 5 procesos por RAM:"
+echo "${BOLD}Top 5 procesos por RAM (antes):${RESET}"
 ps aux | sort -nrk 4 | head -5
-echo
+echo ""
 
 # ==== 2. LIMPIEZA DE CACHÉS ====
 
-echo "🧹 LIMPIEZA DE CACHÉS"
-echo "----------------------"
+section "LIMPIEZA DE CACHÉS"
+
 echo "Limpiando cachés de usuario..."
-rm -rf ~/Library/Caches/* 2>/dev/null
+rm -rf /Users/"$SUDO_USER"/Library/Caches/* 2>/dev/null || true
+info "Cachés de usuario limpiadas."
+
 echo "Limpiando cachés de sistema..."
-rm -rf /Library/Caches/* 2>/dev/null
-echo "Cachés limpiadas."
-echo
+rm -rf /Library/Caches/* 2>/dev/null || true
+info "Cachés de sistema limpiadas."
 
 # ==== 3. LIMPIEZA DE LOGS ====
 
-echo "🧾 LIMPIEZA DE LOGS"
-echo "--------------------"
-rm -rf /var/log/* 2>/dev/null
-echo "Logs limpiados."
-echo
+section "LIMPIEZA DE LOGS"
+
+echo "Eliminando logs rotados y archivos .log en /var/log..."
+find /var/log -type f -name "*.log" -delete 2>/dev/null || true
+find /var/log -type f -name "*.out" -delete 2>/dev/null || true
+info "Logs limpiados (sin afectar servicios críticos)."
 
 # ==== 4. SPOTLIGHT ====
 
-echo "🔍 REINICIANDO SPOTLIGHT"
-echo "------------------------"
-mdutil -a -i off 2>/dev/null
-rm -rf /.Spotlight-V100 2>/dev/null
-mdutil -a -i on 2>/dev/null
-echo "Spotlight reiniciado."
-echo
+section "REINICIO DE SPOTLIGHT"
+
+mdutil -a -i off  >/dev/null 2>&1 || true
+rm -rf /.Spotlight-V100 2>/dev/null || true
+mdutil -a -i on   >/dev/null 2>&1 || true
+
+info "Spotlight reiniciado. El sistema volverá a indexar en segundo plano."
 
 # ==== 5. LAUNCH SERVICES ====
 
-echo "🚀 RECONSTRUYENDO LAUNCH SERVICES"
-echo "---------------------------------"
+section "RECONSTRUYENDO LAUNCH SERVICES"
+
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
-if [ -x "$LSREGISTER" ]; then
-  "$LSREGISTER" -kill -seed -r /Applications /System/Applications /System/Library/CoreServices 2>/dev/null
-  echo "Launch Services reconstruido."
+
+if [[ -x "$LSREGISTER" ]]; then
+  "$LSREGISTER" -kill -seed -r /Applications /System/Applications /System/Library/CoreServices >/dev/null 2>&1 || true
+  info "Launch Services reconstruido (arregla problemas al abrir apps, iconos raros, etc.)."
 else
-  echo "No se encontró lsregister, se salta este paso."
+  warn "No se encontró lsregister, se omite este paso."
 fi
-echo
 
-# ==== 6. RED / DNS ====
+# ==== 6. DNS / RED ====
 
-echo "🌐 LIMPIANDO CACHÉ DNS"
-echo "----------------------"
-dscacheutil -flushcache 2>/dev/null
-killall -HUP mDNSResponder 2>/dev/null
-echo "DNS limpiado."
-echo
+section "LIMPIEZA DE CACHÉ DNS"
+
+dscacheutil -flushcache 2>/dev/null || true
+killall -HUP mDNSResponder 2>/dev/null || true
+info "Caché DNS limpiada."
 
 # ==== 7. PERMISOS DE USUARIO ====
 
-echo "🔐 RESETEANDO PERMISOS DE USUARIO"
-echo "---------------------------------"
-diskutil resetUserPermissions / $(id -u) 2>/dev/null
-echo "Permisos de usuario reseteados (si no hubo errores)."
-echo
+section "RESETEO BÁSICO DE PERMISOS DE USUARIO"
+
+diskutil resetUserPermissions / "$(id -u "$SUDO_USER")" >/dev/null 2>&1 || true
+info "Permisos de usuario reseteados (si no hubo errores)."
 
 # ==== 8. INFORME FINAL ====
 
-echo "📊 INFORME FINAL"
-echo "----------------"
+section "INFORME FINAL"
+
+echo "${BOLD}Uso de disco en / (después):${RESET}"
 df -h /
-echo
+echo ""
 
-echo "Top 5 procesos por CPU (después):"
+echo "${BOLD}Top 5 procesos por CPU (después):${RESET}"
 ps aux | sort -nrk 3 | head -5
-echo
+echo ""
 
-echo "Top 5 procesos por RAM (después):"
+echo "${BOLD}Top 5 procesos por RAM (después):${RESET}"
 ps aux | sort -nrk 4 | head -5
-echo
+echo ""
 
-echo "✅ OPTIMIZACIÓN COMPLETA."
-echo "Recomendado: reiniciar tu Mac."
-echo
+echo ""
+info "OPTIMIZACIÓN COMPLETA."
+warn "Recomendado: reiniciar tu Mac para aplicar todos los cambios."
+echo ""
