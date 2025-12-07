@@ -1,74 +1,86 @@
-🧠 AI Mac Optimizer
+📦 Clean Mac Optimizer 2025
 
-Optimización inteligente para macOS (macOS 12 – macOS 15)
+🚀 AI-Powered macOS Maintenance Tool
 
-AI Mac Optimizer es una herramienta creada para diagnosticar, limpiar y optimizar tu Mac automáticamente.
-Incluye limpieza profunda de cachés, reinicio de servicios, reparación de permisos, análisis de procesos y generación de reporte final.
+Clean Mac Optimizer 2025 es una herramienta simple y profesional diseñada para ejecutar tareas de mantenimiento en macOS con un solo clic.
+Incluye limpieza de cachés, reconstrucción de Spotlight, reinicio de DNS, reparación básica de permisos y más.
+Ideal para usuarios que desean optimizar su Mac sin instalar aplicaciones de terceros.
 
 ⸻
 
-🚀 Instalación rápida (1 solo comando)
+✅ Características
+	•	🧹 Limpieza automática de cachés y logs del sistema
+	•	🔍 Reinicio y reconstrucción de Spotlight
+	•	🖥️ Reconstrucción de Launch Services (arregla íconos duplicados y errores de apertura)
+	•	🌐 Flush DNS para mejorar conexión
+	•	🔐 Reparación básica de permisos de usuario
+	•	📄 Registro detallado guardado automáticamente en ~/.optimizar-mac/
+	•	⚡ Instalador que descarga siempre la última versión del script desde GitHub
 
-Copia y pega en Terminal: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/install.sh)"
-Este comando:
-	•	Descarga el instalador
-	•	Instala el optimizador
-	•	Ejecuta el proceso
-	•	Genera un log detallado
-	•	No requiere descargar archivos manualmente
-	🧹 Funciones del Optimizer
-	Función
-Descripción
-🔍 Diagnóstico del sistema
-Versión macOS + uso de disco + procesos que más consumen CPU y RAM
-🧹 Limpieza de cachés
-Cachés de usuario y sistema
-🧾 Limpieza de logs
-Eliminación de archivos de logs acumulados
-🔍 Reconstrucción Spotlight
-Detiene, limpia e inicia nuevo índice Spotlight
-🚀 Reparación de Launch Services
-Soluciona problemas al abrir apps
-🌐 Limpieza de DNS
-Flushea el DNS para mejorar internet / conexiones
-🔐 Reparación de permisos
-Repara permisos del usuario
-📊 Reporte final
-Muestra estado antes y después de la optimización
-📄 Archivos incluidos
-Archivo
-Función
-optimizar_mac.sh
-Script principal de optimización
-install.sh
-Instalador automático para cualquier Mac
+⸻
+
+📥 Descarga
+
+Descarga el archivo DMG o ZIP desde la sección Releases de este repositorio.
+
+El paquete contiene:
+Clean Mac Optimizer 2025.app
+How to Install.txt
+CleanMacIcon.icns
+
+
+🛠️ Instalación
+	1.	Monta el DMG:
+Clean Mac Optimizer 2025.dmg
+	2.	Arrastra la aplicación a:
+/Applications
+	3.	Si macOS muestra una advertencia de seguridad:
+Ve a System Settings → Privacy & Security → Allow Anyway
+	4.	Ejecuta la app nuevamente → selecciona Open
+	5.	En la primera ejecución, autoriza:
+System Settings → Privacy & Security → Automation
+→ Clean Mac Optimizer 2025 → Terminal
+
+⸻
+
+▶️ Cómo funciona
+
+Al abrir la aplicación:
+	1.	Lanza un instalador .command
+	2.	Descarga automáticamente la última versión del script desde GitHub:
+	https://raw.githubusercontent.com/Megahubcentral/optimizar-mac/main/optimizar_mac.sh
+	3.	Ejecuta todas las tareas de optimización
+	4.	Guarda un registro en:
+	~/.optimizar-mac/optimizar_log_FECHA.log
+
+	🧩 Estructura del proyecto
+
+	/Clean Mac Optimizer 2025.app
+  /Contents
+    /MacOS
+    /Resources
+    Info.plist
+    document.wflow   (Automator application workflow)
+install.sh           (Instalador descargado por la app)
+optimizar_mac.sh     (Script principal, alojado en GitHub)
+README.md            (Este archivo)
+How to Install.txt
+
 ⚠️ Requisitos
-	•	macOS 12, 13, 14 o 15
-	•	Conexión a internet
-	•	Terminal + permisos de admin (sudo)
-🧪 Cómo probarlo localmente
-chmod +x optimizar_mac.sh
-sudo ./optimizar_mac.sh
-📝 Logs
-
-El script genera un archivo log detallado en:
-~/optimizar_mac_YYYYMMDD_HHMMSS.log
-Puedes compartir este log para diagnóstico avanzado.
+	•	macOS 10.9 o superior
+	•	Conexión a internet (para descargar el script)
+	•	Permisos de ejecución en Terminal
 
 ⸻
 
-📦 Próximas mejoras (versión 2.0)
-	•	Reporte HTML con gráficos de consumo
-	•	Análisis de salud del disco (SMART)
-	•	Escaneo de malware ligero
-	•	Optimización de apps de inicio
-	•	Panel web para ver estadísticas
-	•	Modo “Safe Optimize” y modo “Deep Optimize”
-	•	Interfaz gráfica (GUI) con SwiftUI
+👨‍💻 Autor
+
+Victor Santana (Lightchasing Company)
+Con ayuda de IA (ChatGPT) para scripting avanzado y empaquetado.
 
 ⸻
 
-👨🏻‍💻 Autor
+📄 Licencia
 
-Proyecto desarrollado por Victor Santana
-Optimizado y documentado con asistencia de AI (ChatGPT)
+Proyecto de uso personal.
+No redistribuir sin permiso del autor.
